@@ -24,6 +24,7 @@ class TikTokMonitor:
         self.time_label.pack()
         self.start_time = None
         self.root.after(0, self.check_update)
+        self.root.mainloop()
 
     def start_monitor(self):
         usernames = self.entry.get().split(',')
@@ -35,26 +36,6 @@ class TikTokMonitor:
         self.button.config(state=tk.DISABLED)
         self.stop_button.config(state=tk.NORMAL)
         self.start_time = time.time()
-
-        # 获取每个用户最新的视频链接和更新时间
-        for username in self.usernames:
-            url = f"https://www.tiktok.com/@{username}"
-            response = requests.get(url)
-            if response.status_code != 200:
-                self.status_text.insert(tk.END, f"获取用户{username}信息失败\n")
-                continue
-
-            html = response.text
-            start_index = html.find('"createTime":') + len('"createTime":')
-            end_index = html.find(',', start_index)
-            create_time = int(html[start_index:end_index].strip('"'))
-            start_index = html.find('"video":{"id":"') + len('"video":{"id":"')
-            end_index = html.find('"', start_index)
-            video_id = html[start_index:end_index]
-
-            self.last_update_times[username] = create_time
-            self.last_video_urls[username] = f"https://www.tiktok.com/@{username}/video/{video_id}"
-            self.status_text.insert(tk.END, f"{username}最新视频：{self.last_video_urls[username]}\n")
 
     def stop_monitor(self):
         self.usernames = []
